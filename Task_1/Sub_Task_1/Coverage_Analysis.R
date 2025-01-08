@@ -1,7 +1,6 @@
 # Load necessary libraries
 library(dplyr)
 library(ggplot2)
-setwd("C:/Users/Thanu/Downloads")
 # Load data
 data <- read.csv("PupilBioTest_PMP_revA_task1.csv")
 # Calculate coverage (number of occurrences of each CpG site for each tissue)
