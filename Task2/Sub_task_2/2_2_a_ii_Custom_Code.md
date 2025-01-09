@@ -2,7 +2,7 @@
 This script analyzes genetic variation using VCF (Variant Call Format) files. It counts the number of Single Nucleotide Polymorphisms (SNPs) and Insertions/Deletions (INDELs), calculates the total number of mutations, and estimates the background mutation rate based on the callable genome size. The analysis is done using the vcfR package in R.
 
 Data Overview:
-`SNP.vcf`and `Indel.vcf`[Link to VCF File]()
+`SNP.vcf`and `Indel.vcf`[Link to VCF File](https://github.com/thanushree024/PupilBio_CodingChallenge/tree/main/Task2/Sub_task_2/VCF_files)
 
 ### Installation
 If you don't have the vcfR package installed, you can do so by running the following command in R:
