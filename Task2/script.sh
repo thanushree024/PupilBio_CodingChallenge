@@ -99,8 +99,8 @@ gatk MarkDuplicatesSpark -I ${aligned_reads}/Tumor_paired.sam -O ${aligned_reads
 
 echo "STEP 5: Collect Alignment & Insert Size Metrics"
 
-/Users/kr/Desktop/demo/tools/gatk/gatk CollectAlignmentSummaryMetrics R=${ref} I= ${aligned_reads}/Normal_sorted_dedup_reads.bam  O=${aligned_reads}/normal_alignment_metrics.txt
-/Users/kr/Desktop/demo/tools/gatk/gatk CollectInsertSizeMetrics INPUT= ${aligned_reads}/Normal_sorted_dedup_reads.bam OUTPUT=${aligned_reads}/Normal_insert_size_metrics.txt HISTOGRAM_FILE=${aligned_reads}/Normal_insert_size_histogram.pdf
+gatk CollectAlignmentSummaryMetrics R=${ref} I= ${aligned_reads}/Normal_sorted_dedup_reads.bam  O=${aligned_reads}/normal_alignment_metrics.txt
+gatk CollectInsertSizeMetrics INPUT= ${aligned_reads}/Normal_sorted_dedup_reads.bam OUTPUT=${aligned_reads}/Normal_insert_size_metrics.txt HISTOGRAM_FILE=${aligned_reads}/Normal_insert_size_histogram.pdf
 
 
 gatk CollectAlignmentSummaryMetrics R=${ref} I=${aligned_reads}/Tumor_sorted_dedup_reads.bam  O=${aligned_reads}/Tumor_alignment_metrics.txt
