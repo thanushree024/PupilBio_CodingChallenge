@@ -4,6 +4,7 @@
 #Directories
 # - project_dir(/mnt/c/project/Pupil_Bio/task_2)
 #    - ref
+#        -supporting_files
 #    - reads
 #    - results
 #    - aligned
@@ -11,12 +12,14 @@
 
 
 # Set directories path
-ref=/mnt/c/project/Pupil_Bio/task_2/ref/hg38.fa  
+ref=/mnt/c/project/Pupil_Bio/task_2/ref/hg38.fa 
+supporting_files= $ref/supporting_files
 project_dir=/mnt/c/project/Pupil_Bio/task_2
 aligned_reads=$project_dir/aligned
 reads=$project_dir/reads
 results=$project_dir/results
-
+mutect2_supporting_files= $ref/supporting_files
+tmp= $project_dir/tmp
 
 
 # -------------------
