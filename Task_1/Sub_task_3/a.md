@@ -1,0 +1,5 @@
+Sequencing depth (the number of reads obtained for a given region of the genome) has a direct impact on the confidence and specificity of the methylation calls. The higher the sequencing depth, the more reliable the methylation status for each CpG site, since more reads will provide a more accurate representation of the true methylation status. In contrast, low sequencing depth can lead to errors, such as miscalling the methylation status due to insufficient coverage.
+
+Specificity refers to the ability to correctly identify a true negative (i.e., identifying unmethylated sites as unmethylated).
+Confidence is higher with increased depth, as there is less variability in the methylation call, and errors are less likely to be introduced by sequencing noise.
+As sequencing depth increases, the number of reads per CpG site increases, reducing the potential for false positives and false negatives. This improvement in accuracy will also apply to the phased methylation patterns (PMPs), making them more reliable biomarkers for distinguishing tissue types.
