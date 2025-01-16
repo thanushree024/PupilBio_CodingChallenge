@@ -13,7 +13,7 @@
 
 # Set directories path
 ref=/mnt/c/project/Pupil_Bio/task_2/ref/hg38.fa 
-supporting_files= $ref/supporting_files
+supporting_files= /mnt/c/project/Pupil_Bio/task_2/ref/supporting_files
 project_dir=/mnt/c/project/Pupil_Bio/task_2
 aligned_reads=$project_dir/aligned
 reads=$project_dir/reads
@@ -114,6 +114,98 @@ gatk CollectInsertSizeMetrics INPUT=${aligned_reads}/Tumor_sorted_dedup_reads.ba
 # VARIANT CALLING USING MUTECT2
 # -------------------------------------------------------------------------------------------------------------------------------------
 
+if false
+then
+echo "Download Mutect2 supporting files."
+
+################################################### Mutect2 files (TO BE DOWNLOADED ONLY ONCE) ##########################################################
+
+# gnomAD
+wget https://storage.googleapis.com/gcp-public-data--broad-references/hg38/v0/somatic-hg38/af-only-gnomad.hg38.vcf.gz /mnt/c/project/Pupil_Bio/task_2/ref/supporting_files
+wget https://storage.googleapis.com/gcp-public-data--broad-references/hg38/v0/somatic-hg38/af-only-gnomad.hg38.vcf.gz.tbi /mnt/c/project/Pupil_Bio/task_2/ref/supporting_files
+
+# PoN
+wget https://storage.googleapis.com/gatk-best-practices/somatic-hg38/1000g_pon.hg38.vcf.gz /mnt/c/project/Pupil_Bio/task_2/ref/supporting_files
+wget https://storage.googleapis.com/gatk-best-practices/somatic-hg38/1000g_pon.hg38.vcf.gz.tbi /mnt/c/project/Pupil_Bio/task_2/ref/supporting_files
+
+# to create your own panel of normals: https://gatk.broadinstitute.org/hc/en-us/articles/360037058172-CreateSomaticPanelOfNormals-BETA
+
+# intervals list
+wget https://storage.googleapis.com/gcp-public-data--broad-references/hg38/v0/exome_calling_regions.v1.1.interval_list /mnt/c/project/Pupil_Bio/task_2/ref/supporting_files
+
+# ----------------------------------------------
+# STEP 5: Call Somatic Variants - Mutect2
+# ----------------------------------------------
+
+echo " Variant calling - Mutct2"
+
+ Mutect2 -R ${ref} \
+     -I ${aligned_reads}/Tumor_sorted_dedup_reads.bam \
+     -I ${aligned_reads}/Normal_sorted_dedup_reads.bam \
+     -tumor Tumor \
+     -normal Normal \
+     --germline-resource ${supporting_files}/af-only-gnomad.hg38.vcf.gz \
+     --panel-of-normals ${supporting_files}/1000g_pon.hg38.vcf.gz \
+     -O ${results}/somatic_variants_mutect2.vcf.gz \
+     --f1r2-tar-gz ${results}/somatic_f1r2.tar.gz \
+# ----------------------------------------------
+# STEP 6: Estimate cross-sample contamination
+# ----------------------------------------------
+
+# GetPileupSummaries
+# Summarizes counts of reads that support reference, alternate and other alleles for given sites. Results are used with CalculateContamination.
+
+
+echo "STEP 7: Estimate cross-sample contamination"
+
+# tumor
+gatk  GetPileupSummaries \
+    --java-options '-Xmx50G' --tmp-dir ${project_dir}/tmp/ \
+    -I ${aligned_reads}/Tumor_sorted_dedup_reads.bam \
+    -V ${mutect2_supporting_files}/af-only-gnomad.hg38.vcf.gz \
+    -L ${mutect2_supporting_files}/exome_calling_regions.v1.1.interval_list \
+    -O ${results}/Tumor_getpileupsummaries.table
+
+# normal
+gatk GetPileupSummaries \
+    --java-options '-Xmx50G' --tmp-dir ${project_dir}/tmp/ \
+    -I ${aligned_reads}/Normal_sorted_dedup_reads.bam  \
+    -V ${mutect2_supporting_files}/af-only-gnomad.hg38.vcf.gz \
+    -L ${mutect2_supporting_files}/exome_calling_regions.v1.1.interval_list \
+    -O ${results}/Normal_getpileupsummaries.table
+
+
+
+# Calculate contamination
+gatk CalculateContamination \
+    -I ${results}/Tumor_getpileupsummaries.table \
+    -matched ${results}/Normal_getpileupsummaries.table \
+    -O ${results}/normal_tumor_pair_calculatecontamination.table 
+
+
+# ----------------------------------------------
+# STEP 7: Estimate read orientation artifacts
+# ----------------------------------------------
+
+echo "STEP 8: Estimate read orientation artifacts"
+
+# read orientation
+gatk LearnReadOrientationModel \
+    -I ${results}/somatic_f1r2.tar.gz \
+    -O ${results}/read-orientation-model.tar.gz
+
+
+# ----------------------------------------------
+# STEP 8: Filter Variants Called By Mutect2
+# ----------------------------------------------
+
+echo "STEP 9: Filter Variants"
+gatk FilterMutectCalls \
+        -V ${results}/somatic_variants_mutect2.vcf.gz \
+        -R ${ref} \
+        --contamination-table ${results}/normal_tumor_pair_calculatecontamination.table \
+        --ob-priors ${results}/read-orientation-model.tar.gz \
+        -O ${results}/somatic_variants_filtered_mutect2.vcf
 
 
 
